@@ -1,0 +1,271 @@
+{
+  "versao": 1,
+  "descricao": "As perguntas da instalação. O install.py faz estas perguntas no terminal; a skill ponte-pc faz as mesmas com AskUserQuestion e entrega as respostas em --respostas. Cada resposta é o campo 'valor' da opção escolhida (ou o texto/número digitado).",
+  "perguntas": [
+    {
+      "id": "so_principal",
+      "pergunta": "Qual computador você usa no dia a dia, o que roda o Claude Code?",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "macos",
+          "rotulo": "Mac (macOS)",
+          "descricao": "Suportado."
+        },
+        {
+          "valor": "outro",
+          "rotulo": "Windows ou Linux",
+          "descricao": "Ainda não: o controlador usa ferramentas do macOS. Veja o README, seção Roteiro."
+        }
+      ],
+      "padrao": "macos"
+    },
+    {
+      "id": "so_trabalho",
+      "pergunta": "E a máquina que vai pegar o trabalho pesado?",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "windows",
+          "rotulo": "PC com Windows 10/11",
+          "descricao": "Suportado. O agente roda na sua sessão e aparece na bandeja."
+        },
+        {
+          "valor": "outro",
+          "rotulo": "Linux ou outro Mac",
+          "descricao": "Ainda não. Veja o Roteiro no README."
+        }
+      ],
+      "padrao": "windows"
+    },
+    {
+      "id": "gpu",
+      "pergunta": "Que placa de vídeo o PC tem?",
+      "ajuda": "Define a tabela de velocidades do `pc onde` e se o PC recebe transcrição, IA de imagem/vídeo e encode por hardware (NVENC).",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "nvidia",
+          "rotulo": "NVIDIA GeForce/RTX",
+          "descricao": "Perfil 'nvidia': NVENC, NVDEC, CUDA. Vale a pena ajustar as velocidades depois."
+        },
+        {
+          "valor": "sem-gpu",
+          "rotulo": "AMD, Intel ou só vídeo integrado",
+          "descricao": "Perfil 'sem-gpu': o PC é só mais CPU; o que exige GPU fica no Mac."
+        }
+      ],
+      "padrao": "nvidia"
+    },
+    {
+      "id": "acesso",
+      "pergunta": "De onde você vai mandar tarefas para o PC?",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "casa",
+          "rotulo": "Só de casa (mesma rede)",
+          "descricao": "Mais simples. Nada para instalar além da Ponte."
+        },
+        {
+          "valor": "tailscale",
+          "rotulo": "De casa e de fora (Tailscale)",
+          "descricao": "Instala o Tailscale no PC (winget) e usa o do Mac. Você precisa de uma conta Tailscale (grátis)."
+        }
+      ],
+      "padrao": "casa"
+    },
+    {
+      "id": "faixa_rede",
+      "pergunta": "Qual a faixa da rede de casa? (onde a Ponte procura o PC se o IP dele mudar)",
+      "ajuda": "O instalador sugere a faixa /24 da rede em que o Mac está agora. Em redes maiores use /22 ou /16.",
+      "tipo": "texto",
+      "padrao": "@detectar:faixa_rede",
+      "avancado": true
+    },
+    {
+      "id": "nas",
+      "pergunta": "Você tem um NAS ou uma pasta de rede compartilhada que as duas máquinas usam para os arquivos?",
+      "ajuda": "Com ele, `pc roda` traduz sozinho um caminho do Mac (ex.: /Volumes/Projetos/x.mov) para o caminho de rede do Windows, e o Mac fora de casa manda o trabalho ao PC, que está ao lado do NAS.",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "nao",
+          "rotulo": "Não",
+          "descricao": "Arquivos vão e voltam com `pc envia` / `pc traz`."
+        },
+        {
+          "valor": "smb",
+          "rotulo": "Sim, por SMB (Synology, QNAP, Windows, Samba...)",
+          "descricao": "O PC pede usuário e senha do NAS uma vez e guarda no Gerenciador de Credenciais do Windows."
+        }
+      ],
+      "padrao": "nao"
+    },
+    {
+      "id": "nas_host",
+      "pergunta": "Endereço do NAS (IP ou nome)?",
+      "tipo": "texto",
+      "so_se": {
+        "nas": "smb"
+      },
+      "exemplo": "192.168.1.50"
+    },
+    {
+      "id": "nas_share",
+      "pergunta": "Nome do compartilhamento (share) no NAS?",
+      "tipo": "texto",
+      "so_se": {
+        "nas": "smb"
+      },
+      "exemplo": "Projetos"
+    },
+    {
+      "id": "nas_mac",
+      "pergunta": "Onde esse share aparece montado no Mac?",
+      "tipo": "texto",
+      "so_se": {
+        "nas": "smb"
+      },
+      "padrao": "@detectar:nas_mac",
+      "exemplo": "/Volumes/Projetos"
+    },
+    {
+      "id": "modulos",
+      "pergunta": "O que mais instalar no PC?",
+      "tipo": "multi",
+      "opcoes": [
+        {
+          "valor": "transcricao",
+          "rotulo": "Transcrição (faster-whisper em CUDA)",
+          "descricao": "Só com GPU NVIDIA. Cria um venv no PC e baixa ~3 GB (bibliotecas CUDA e modelo). No Mac, `ponte_whisper` entra no lugar do mlx_whisper e cai nele se o PC estiver ocupado."
+        },
+        {
+          "valor": "claude_code",
+          "rotulo": "Claude Code no PC",
+          "descricao": "Para você abrir sessões do Claude lá também. Pede login manual uma vez."
+        },
+        {
+          "valor": "pausa_jogos",
+          "rotulo": "Pausar a Ponte sozinha quando um jogo abrir",
+          "descricao": "O agente olha o programa em primeiro plano e segura os jobs enquanto você joga."
+        }
+      ],
+      "padrao": [
+        "pausa_jogos"
+      ]
+    },
+    {
+      "id": "pacotes",
+      "pergunta": "Quais programas base o instalador pode pôr no PC com o winget?",
+      "ajuda": "Python e FFmpeg são necessários para quase tudo. Você pode tirar o que já tem; o winget pula o que já está instalado.",
+      "tipo": "multi",
+      "opcoes": [
+        {
+          "valor": "Python.Python.3.12",
+          "rotulo": "Python 3.12",
+          "descricao": "Roda o agente."
+        },
+        {
+          "valor": "Gyan.FFmpeg",
+          "rotulo": "FFmpeg",
+          "descricao": "Encode/decode, com NVENC se houver GPU NVIDIA."
+        },
+        {
+          "valor": "Microsoft.PowerShell",
+          "rotulo": "PowerShell 7",
+          "descricao": "Shell padrão dos jobs (`pc roda`)."
+        },
+        {
+          "valor": "astral-sh.uv",
+          "rotulo": "uv",
+          "descricao": "Cria venvs de Python rápido (necessário para a transcrição)."
+        },
+        {
+          "valor": "Git.Git",
+          "rotulo": "Git",
+          "descricao": "Útil para jobs que clonam repositórios."
+        }
+      ],
+      "padrao": [
+        "Python.Python.3.12",
+        "Gyan.FFmpeg",
+        "Microsoft.PowerShell",
+        "astral-sh.uv",
+        "Git.Git"
+      ]
+    },
+    {
+      "id": "winget_extra",
+      "pergunta": "Mais algum pacote do winget? (IDs separados por vírgula, ou deixe vazio)",
+      "ajuda": "Para achar o ID de um programa, rode `winget search nome` no PC. Deixe vazio se não precisa.",
+      "tipo": "texto",
+      "padrao": "",
+      "avancado": true
+    },
+    {
+      "id": "teto_mac",
+      "pergunta": "Até quantos % de CPU/GPU o Mac pode chegar fazendo tarefa em paralelo com o PC enquanto VOCÊ está usando?",
+      "ajuda": "Acima disso a Ponte manda para o PC (ou espera). 70 deixa o Mac confortável; 50 se você edita vídeo ao vivo; 85 se aguenta tudo.",
+      "tipo": "numero",
+      "padrao": 70,
+      "minimo": 20,
+      "maximo": 100
+    },
+    {
+      "id": "teto_mac_ausente",
+      "pergunta": "E quando você sai do Mac por mais de 10 minutos?",
+      "tipo": "numero",
+      "padrao": 85,
+      "minimo": 20,
+      "maximo": 100
+    },
+    {
+      "id": "porta",
+      "pergunta": "Porta do agente no PC?",
+      "tipo": "numero",
+      "padrao": 17850,
+      "minimo": 1024,
+      "maximo": 65535,
+      "avancado": true
+    },
+    {
+      "id": "instalar_skill",
+      "pergunta": "Instalar a skill ponte-pc no Claude Code (~/.claude/skills)?",
+      "ajuda": "A skill ensina o Claude a rodar `pc onde` antes de render/encode/transcrição e a delegar sozinho. Se já existir uma skill com esse nome, o instalador guarda a antiga ao lado.",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "sim",
+          "rotulo": "Sim",
+          "descricao": ""
+        },
+        {
+          "valor": "nao",
+          "rotulo": "Não, só as ferramentas",
+          "descricao": ""
+        }
+      ],
+      "padrao": "sim"
+    },
+    {
+      "id": "instalar_agora",
+      "pergunta": "Depois de configurar o Mac, já abrir o instalador do PC (`pc instalar`)?",
+      "ajuda": "Ele serve um comando de uma linha para você colar num PowerShell como administrador no PC e espera o PC avisar.",
+      "tipo": "escolha",
+      "opcoes": [
+        {
+          "valor": "sim",
+          "rotulo": "Sim, agora",
+          "descricao": ""
+        },
+        {
+          "valor": "nao",
+          "rotulo": "Depois",
+          "descricao": "Rode `pc instalar` quando estiver diante do PC."
+        }
+      ],
+      "padrao": "sim"
+    }
+  ]
+}

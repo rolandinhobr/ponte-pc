@@ -1,0 +1,23 @@
+{
+  "porta": 17850,
+  "perfil": "nvidia",
+  "rede": "192.168.1.0/24",
+  "teto_mac": 70,
+  "teto_mac_ausente": 85,
+  "pc_cheio": 95,
+  "tailscale": false,
+  "nas_host": "192.168.1.50",
+  "nas_share": "Projetos",
+  "nas_mac": "/Volumes/Projetos",
+  "velocidade": {
+    "encode": [9.5, 7.0],
+    "transcricao": [3.5, 1.0]
+  },
+  "instalar": {
+    "pacotes": ["Python.Python.3.12", "Gyan.FFmpeg", "Git.Git", "Microsoft.PowerShell", "astral-sh.uv"],
+    "nas": true,
+    "claude_code": false,
+    "whisper": true,
+    "pausa_jogos": true
+  }
+}
